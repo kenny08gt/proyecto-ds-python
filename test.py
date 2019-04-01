@@ -6,8 +6,9 @@ Created on Sun Mar 31 20:09:24 2019
 @author: lionmane
 """
 import numpy as np
-import seaborn as sns
-import pandas as pd
+#import seaborn as sns
+#import pandas as pd
+import matplotlib.pyplot as plt
 data = np.load('proyecto_training_data.npy')
 train_data_length = (int)(data.shape[0] * 0.8)
 train_data = data[0:train_data_length,:]
@@ -66,6 +67,38 @@ statistics_outputter(loat_front_statistics, 'loat_front_statistics')
 #sns.distplot(total_rooms_td, label = 'Total rooms above grade')
 #sns.distplot(year_built_td, label = 'Original construction date')
 #sns.distplot(loat_front_td, label = 'Linear feet of street connected to property')
+
+def add_scatter_plot(x, y,x_label, y_label):
+    corr_coef = np.corrcoef(x, y)
+    
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1) 
+    
+    ax.scatter(x, y)
+    
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    ax.set_title('%s Vs %s (%f)' % (x_label, y_label, corr_coef[0,1]))
+
+    plt.show()    
+    
+print_hr()
+add_scatter_plot(overall_quality_td, sale_price_td, 'Overall Qua.', 'Sales Price')
+
+print_hr()
+add_scatter_plot(first_floor_square_feet_td, sale_price_td, 'First Floor Square', 'Sales Price')
+
+print_hr()
+add_scatter_plot(total_rooms_td, sale_price_td, 'Total Rooms', 'Sales Price')
+
+print_hr()
+add_scatter_plot(year_built_td, sale_price_td, 'Year built', 'Sales Price')
+
+print_hr()
+add_scatter_plot(loat_front_td, sale_price_td, 'Loat front', 'Sales Price')
+
+
+
 
 
 
