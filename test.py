@@ -21,84 +21,113 @@ total_rooms_td = train_data[:,3]
 year_built_td = train_data[:,4]
 loat_front_td = np.nan_to_num(train_data[:,5])
 
-def get_mean_max_min_range_dv(nd_array):
-    mean = np.mean(nd_array)
-    c_max = np.max(nd_array)
-    c_min = np.min(nd_array)
-    c_range = np.ptp(nd_array)
-    dv = np.std(nd_array)
-    return (mean, c_max, c_min, c_range, dv)
+data_labels = ["Sales Price", "Overall material and finish quality", 'First Floor square feet', 'Total rooms above grade', 'Original construction date', 'Linear feet of street connected to property']
+#
+#def get_mean_max_min_range_dv(nd_array):
+#    mean = np.mean(nd_array)
+#    c_max = np.max(nd_array)
+#    c_min = np.min(nd_array)
+#    c_range = np.ptp(nd_array)
+#    dv = np.std(nd_array)
+#    return (mean, c_max, c_min, c_range, dv)
+#
+#def statistics_outputter(statistics, name):
+#    print('Statistics of %s' % name)
+#    print('Mean: %f' % statistics[0])
+#    print('Max: %f' % statistics[1])
+#    print('Mean: %f' % statistics[2])
+#    print('Range: %f' % statistics[3])
+#    print('Standar deviation: %f' % statistics[4])
+#
+#def print_hr():
+#    print('***************************************************')
+#    
+#sale_price_statistics = get_mean_max_min_range_dv(sale_price_td)
+#overall_quality_statistics = get_mean_max_min_range_dv(overall_quality_td)
+#first_floor_square_feet_statistics = get_mean_max_min_range_dv(first_floor_square_feet_td)
+#total_rooms_statistics = get_mean_max_min_range_dv(total_rooms_td)
+#year_built_statisctics = get_mean_max_min_range_dv(year_built_td)
+#loat_front_statistics = get_mean_max_min_range_dv(loat_front_td)
+#
+#print_hr()
+#statistics_outputter(sale_price_statistics, data_labels[0])
+#print_hr()
+#statistics_outputter(overall_quality_statistics, data_labels[1])
+#print_hr()
+#statistics_outputter(first_floor_square_feet_statistics, data_labels[2])
+#print_hr()
+#statistics_outputter(total_rooms_statistics, data_labels[3])
+#print_hr()
+#statistics_outputter(year_built_statisctics, data_labels[4])
+#print_hr()
+#statistics_outputter(loat_front_statistics, data_labels[5])
+#
+#
+##sns.distplot(sale_price_statistics)
+##sns.distplot(overall_quality_statistics)
+##sns.distplot(first_floor_square_feet_td, label = 'First Floor square feet')
+##sns.distplot(total_rooms_td, label = 'Total rooms above grade')
+##sns.distplot(year_built_td, label = 'Original construction date')
+##sns.distplot(loat_front_td, label = 'Linear feet of street connected to property')
+#
+#def add_scatter_plot(x, y,x_label, y_label):
+#    corr_coef = np.corrcoef(x, y)
+#    
+#    fig = plt.figure()
+#    ax = fig.add_subplot(1,1,1) 
+#    
+#    ax.scatter(x, y)
+#    
+#    ax.set_xlabel(x_label)
+#    ax.set_ylabel(y_label)
+#    ax.set_title('%s Vs %s (%f)' % (x_label, y_label, corr_coef[0,1]))
+#
+#    plt.show()    
+#    
+#print_hr()
+#add_scatter_plot(overall_quality_td, sale_price_td, data_labels[1], data_labels[0])
+#
+#print_hr()
+#add_scatter_plot(first_floor_square_feet_td, sale_price_td, data_labels[2], data_labels[0])
+#
+#print_hr()
+#add_scatter_plot(total_rooms_td, sale_price_td, data_labels[3], data_labels[0])
+#
+#print_hr()
+#add_scatter_plot(year_built_td, sale_price_td, data_labels[4], data_labels[0])
+#
+#print_hr()
+#add_scatter_plot(loat_front_td, sale_price_td, data_labels[5], data_labels[0])
+#
+def train_model(x_nd_array, y_nd_array, epochs, imprimir_error_cada, learning_rate):
 
-def statistics_outputter(statistics, name):
-    print('Statistics of %s' % name)
-    print('Mean: %f' % statistics[0])
-    print('Max: %f' % statistics[1])
-    print('Mean: %f' % statistics[2])
-    print('Range: %f' % statistics[3])
-    print('Standar deviation: %f' % statistics[4])
-
-def print_hr():
-    print('***************************************************')
+    print(y_nd_array.shape)
+    mat = np.column_stack((x_nd_array, np.ones_like(x_nd_array)))
+    print(mat.shape)
+    y_hat_arr = np.array([])
+    error_arr = np.array([])
     
-sale_price_statistics = get_mean_max_min_range_dv(sale_price_td)
-overall_quality_statistics = get_mean_max_min_range_dv(overall_quality_td)
-first_floor_square_feet_statistics = get_mean_max_min_range_dv(first_floor_square_feet_td)
-total_rooms_statistics = get_mean_max_min_range_dv(total_rooms_td)
-year_built_statisctics = get_mean_max_min_range_dv(year_built_td)
-loat_front_statistics = get_mean_max_min_range_dv(loat_front_td)
-
-print_hr()
-statistics_outputter(sale_price_statistics, 'Sale price')
-print_hr()
-statistics_outputter(overall_quality_statistics, 'Overall material and finish quality')
-print_hr()
-statistics_outputter(first_floor_square_feet_statistics, 'First Floor square')
-print_hr()
-statistics_outputter(total_rooms_statistics, 'Total rooms')
-print_hr()
-statistics_outputter(year_built_statisctics, 'year_built_statisctics')
-print_hr()
-statistics_outputter(loat_front_statistics, 'loat_front_statistics')
-
-
-#sns.distplot(sale_price_statistics)
-#sns.distplot(overall_quality_statistics)
-#sns.distplot(first_floor_square_feet_td, label = 'First Floor square feet')
-#sns.distplot(total_rooms_td, label = 'Total rooms above grade')
-#sns.distplot(year_built_td, label = 'Original construction date')
-#sns.distplot(loat_front_td, label = 'Linear feet of street connected to property')
-
-def add_scatter_plot(x, y,x_label, y_label):
-    corr_coef = np.corrcoef(x, y)
+    for i in range(0, epochs):
+        y_hat = np.matmul(y_nd_array, mat)
+#        print('y_hat')
+#        print(y_hat)
+#        print('y')
+#        print(y_nd_array)
+        np.append(y_hat_arr, y_hat)
+        error = (0.5)*np.mean(np.power((y_nd_array - y_hat[0]) , 2))
+        if i % imprimir_error_cada == 0 :
+            print('Error %f' % error)
+            
+        np.append(error_arr, error)
+        gradiente_m = np.mean((y_hat[0] - y_nd_array)*x_nd_array)
+        gradiente_b = np.mean(y_hat[0] - y_nd_array)
+#        print(gradiente)
+        mat = np.array([mat[0] - learning_rate*gradiente_m, mat[1] - learning_rate*gradiente_b])
+#        print('mat')
+#        print(mat.shape)
+        
     
-    fig = plt.figure()
-    ax = fig.add_subplot(1,1,1) 
-    
-    ax.scatter(x, y)
-    
-    ax.set_xlabel(x_label)
-    ax.set_ylabel(y_label)
-    ax.set_title('%s Vs %s (%f)' % (x_label, y_label, corr_coef[0,1]))
+    return (y_hat_arr, error_arr)
 
-    plt.show()    
-    
-print_hr()
-add_scatter_plot(overall_quality_td, sale_price_td, 'Overall Qua.', 'Sales Price')
-
-print_hr()
-add_scatter_plot(first_floor_square_feet_td, sale_price_td, 'First Floor Square', 'Sales Price')
-
-print_hr()
-add_scatter_plot(total_rooms_td, sale_price_td, 'Total Rooms', 'Sales Price')
-
-print_hr()
-add_scatter_plot(year_built_td, sale_price_td, 'Year built', 'Sales Price')
-
-print_hr()
-add_scatter_plot(loat_front_td, sale_price_td, 'Loat front', 'Sales Price')
-
-
-
-
-
+train_model(overall_quality_td, sale_price_td, 15, 1,1)
 
