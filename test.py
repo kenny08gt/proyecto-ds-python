@@ -104,30 +104,49 @@ def train_model(x_nd_array, y_nd_array, epochs, imprimir_error_cada, learning_ra
     print(y_nd_array.shape)
     mat = np.column_stack((x_nd_array, np.ones_like(x_nd_array)))
     print(mat.shape)
-    y_hat_arr = np.array([])
-    error_arr = np.array([])
+    y_hat_arr = []
+    error_arr = []
+    m = np.mean(y_nd_array) / np.mean(x_nd_array)
+    b = y_nd_array - m*x_nd_array
+
     
-    for i in range(0, epochs):
-        y_hat = np.matmul(y_nd_array, mat)
-#        print('y_hat')
-#        print(y_hat)
-#        print('y')
-#        print(y_nd_array)
-        np.append(y_hat_arr, y_hat)
-        error = (0.5)*np.mean(np.power((y_nd_array - y_hat[0]) , 2))
-        if i % imprimir_error_cada == 0 :
-            print('Error %f' % error)
-            
-        np.append(error_arr, error)
-        gradiente_m = np.mean((y_hat[0] - y_nd_array)*x_nd_array)
-        gradiente_b = np.mean(y_hat[0] - y_nd_array)
-#        print(gradiente)
-        mat = np.array([mat[0] - learning_rate*gradiente_m, mat[1] - learning_rate*gradiente_b])
-#        print('mat')
-#        print(mat.shape)
+    for i in range(epochs):
         
+        vector = [m, np.mean(b)]
+        
+        y_hat = np.matmul(mat, vector)
+        
+        y_hat_arr.append(y_hat)
+        error = (0.5)*np.mean(np.power((y_hat[0] - y_nd_array) , 2))
+        
+        if i % imprimir_error_cada == 0:
+            print(error)
+        
+        error_arr.append(error)
+        
+        gradiente_m = np.mean((y_hat[0] - y_nd_array)*x_nd_array)
+        gradiente_b = np.mean(y_hat[1] - y_nd_array)
+        
+        m = m - learning_rate*gradiente_m
+        b = b - learning_rate*gradiente_b
     
-    return (y_hat_arr, error_arr)
+    return y_hat_arr, error_arr
 
-train_model(overall_quality_td, sale_price_td, 15, 1,1)
+train_data_y_hat, train_data_error = train_model(overall_quality_td, sale_price_td, 100, 20, 0.001)
 
+fig = plt.figure()
+ax = fig.add_subplot(1,1,1) 
+
+
+ax.grid()
+ax.set_xlim(0, len(train_data_y_hat))
+ax.set_ylim(np.min(train_data_error), np.max(train_data_error))
+ax.plot(list(range(0, len(train_data_y_hat))), train_data_error)
+
+ax.set_xlabel('# de iteración')
+ax.set_ylabel('Error')
+ax.set_title('Grafica de # de iteracion vrs error')
+
+plt.show()
+
+#print(train_data_y_hat)
