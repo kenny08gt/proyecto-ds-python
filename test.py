@@ -39,8 +39,8 @@ data_labels = ["Sales Price", "Overall material and finish quality", 'First Floo
 #    print('Range: %f' % statistics[3])
 #    print('Standar deviation: %f' % statistics[4])
 #
-#def print_hr():
-#    print('***************************************************')
+def print_hr():
+    print('***************************************************')
 #    
 #sale_price_statistics = get_mean_max_min_range_dv(sale_price_td)
 #overall_quality_statistics = get_mean_max_min_range_dv(overall_quality_td)
@@ -104,19 +104,15 @@ def train_model(x_nd_array, y_nd_array, epochs, imprimir_error_cada, learning_ra
     print(y_nd_array.shape)
     mat = np.column_stack((x_nd_array, np.ones_like(x_nd_array)))
     print(mat.shape)
-    y_hat_arr = []
+    parameter_arr = {}
     error_arr = []
     m = np.mean(y_nd_array) / np.mean(x_nd_array)
     b = y_nd_array - m*x_nd_array
 
-    
     for i in range(epochs):
-        
         vector = [m, np.mean(b)]
-        
+        parameter_arr[i] = vector
         y_hat = np.matmul(mat, vector)
-        
-        y_hat_arr.append(y_hat)
         error = (0.5)*np.mean(np.power((y_hat[0] - y_nd_array) , 2))
         
         if i % imprimir_error_cada == 0:
@@ -130,23 +126,69 @@ def train_model(x_nd_array, y_nd_array, epochs, imprimir_error_cada, learning_ra
         m = m - learning_rate*gradiente_m
         b = b - learning_rate*gradiente_b
     
-    return y_hat_arr, error_arr
+    return parameter_arr, error_arr
 
-train_data_y_hat, train_data_error = train_model(overall_quality_td, sale_price_td, 100, 20, 0.001)
+train_data_parameter_arr, train_data_error = train_model(overall_quality_td, sale_price_td, 10000, 10000, 0.0005)
 
+#print(train_data_parameter_arr)
 fig = plt.figure()
 ax = fig.add_subplot(1,1,1) 
 
 
 ax.grid()
-ax.set_xlim(0, len(train_data_y_hat))
+ax.set_xlim(0, len(train_data_parameter_arr))
 ax.set_ylim(np.min(train_data_error), np.max(train_data_error))
-ax.plot(list(range(0, len(train_data_y_hat))), train_data_error)
-
+ax.plot(list(range(0, len(train_data_parameter_arr))), train_data_error)
+ax.set_ylim(3e9,3.5e9)
+ax.set_xlim(0,300)
 ax.set_xlabel('# de iteración')
 ax.set_ylabel('Error')
 ax.set_title('Grafica de # de iteracion vrs error')
 
 plt.show()
+print_hr()
 
-#print(train_data_y_hat)
+#print(train_data_parameter_arr[1][0])
+
+
+
+def model_in_time(parameter_arr, n):
+   
+    
+#    print(parameter_arr)
+    plot_count = 1
+    for i in range(len(parameter_arr)):    
+        if i % n == 0:             
+            fig = plt.figure()
+            x_ax = []
+            y_ax = []
+            for j in range(12):
+#                print(parameter_arr[i])
+#                print('m %f en i %d' %(parameter_arr[i][0], i))
+                x_ax.append(j)
+                y_ax.append(parameter_arr[i][0]*j + parameter_arr[i][1])
+            
+            
+            ax = fig.add_subplot(1, 1, 1)
+            plt.plot(x_ax, y_ax, label = 'modelo en %d' % i)
+            
+            ax.set_xlim(0,12)
+            ax.set_ylim(0,1000000)
+            
+            plt.scatter(overall_quality_td, sale_price_td, label = 'Overral Q vrs Sale Price',  color=[1, 0, 0],)
+            
+            ax.legend() #si no ejecutamos la función "legend" , no se mostraran los labels usados con plot
+            ax.set_xlabel('x')
+            ax.set_ylabel('y')
+            plt.show()
+        
+#    ax.set_title('2 curvas en una gráfica')
+
+ 
+    
+#model_in_time(train_data_parameter_arr, 1000)
+    
+    
+    
+    
+    
