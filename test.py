@@ -9,6 +9,8 @@ import numpy as np
 #import seaborn as sns
 #import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+
 data = np.load('proyecto_training_data.npy')
 train_data_length = (int)(data.shape[0] * 0.8)
 train_data = data[0:train_data_length,:]
@@ -128,41 +130,41 @@ def train_model(x_nd_array, y_nd_array, epochs, imprimir_error_cada, learning_ra
     
     return parameter_arr, error_arr
 
-train_data_parameter_arr, train_data_error = train_model(overall_quality_td, sale_price_td, 10000, 10000, 0.0005)
+#train_data_parameter_arr, train_data_error = train_model(overall_quality_td, sale_price_td, 10000, 10000, 0.0005)
+
+def add_error_gragh(train_data_parameter_arr,train_data_error, label_title):
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1) 
+    
+    
+    ax.grid()
+    ax.set_xlim(0, len(train_data_parameter_arr))
+    ax.set_ylim(np.min(train_data_error), np.max(train_data_error))
+    ax.plot(list(range(0, len(train_data_parameter_arr))), train_data_error)
+#    ax.set_ylim(3e9,3.5e9)
+#    ax.set_xlim(0,300)
+    ax.set_xlabel('# de iteración')
+    ax.set_ylabel('Error')
+    ax.set_title(label_title)
+    
+    plt.show()    
 
 #print(train_data_parameter_arr)
-fig = plt.figure()
-ax = fig.add_subplot(1,1,1) 
 
-
-ax.grid()
-ax.set_xlim(0, len(train_data_parameter_arr))
-ax.set_ylim(np.min(train_data_error), np.max(train_data_error))
-ax.plot(list(range(0, len(train_data_parameter_arr))), train_data_error)
-ax.set_ylim(3e9,3.5e9)
-ax.set_xlim(0,300)
-ax.set_xlabel('# de iteración')
-ax.set_ylabel('Error')
-ax.set_title('Grafica de # de iteracion vrs error')
-
-plt.show()
-print_hr()
+#print_hr()
 
 #print(train_data_parameter_arr[1][0])
 
 
 
-def model_in_time(parameter_arr, n):
-   
-    
-#    print(parameter_arr)
-    plot_count = 1
+def model_in_time(parameter_arr,x, n, label_title):
+
     for i in range(len(parameter_arr)):    
         if i % n == 0:             
             fig = plt.figure()
             x_ax = []
             y_ax = []
-            for j in range(12):
+            for j in range((int)(np.max(x))):
 #                print(parameter_arr[i])
 #                print('m %f en i %d' %(parameter_arr[i][0], i))
                 x_ax.append(j)
@@ -172,10 +174,10 @@ def model_in_time(parameter_arr, n):
             ax = fig.add_subplot(1, 1, 1)
             plt.plot(x_ax, y_ax, label = 'modelo en %d' % i)
             
-            ax.set_xlim(0,12)
-            ax.set_ylim(0,1000000)
+#            ax.set_xlim(0,12)
+#            ax.set_ylim(0,1000000)
             
-            plt.scatter(overall_quality_td, sale_price_td, label = 'Overral Q vrs Sale Price',  color=[1, 0, 0],)
+            plt.scatter(x, sale_price_td, label = label_title,  color=[1, 0, 0],)
             
             ax.legend() #si no ejecutamos la función "legend" , no se mostraran los labels usados con plot
             ax.set_xlabel('x')
@@ -184,11 +186,76 @@ def model_in_time(parameter_arr, n):
         
 #    ax.set_title('2 curvas en una gráfica')
 
- 
+
+modelos_overall_quality, errores_overall_quality = train_model(overall_quality_td, sale_price_td, 500, 500, 0.0005)
+#add_error_gragh(modelos_overall_quality, errores_overall_quality, 'Grafica %s vrs %s' %(data_labels[1], data_labels[0]))
+#model_in_time(modelos_overall_quality, overall_quality_td, 500, '%s vrs %s' %(data_labels[1], data_labels[0]))
+#
+modelos_first_floor_square, errores_first_floor_square = train_model(first_floor_square_feet_td, sale_price_td, 20, 20, 0.0000009)
+#add_error_gragh(modelos_first_floor_square, errores_first_floor_square, 'Grafica %s vrs %s' %(data_labels[2], data_labels[0]))
+#model_in_time(modelos_first_floor_square, first_floor_square_feet_td, 20, '%s vrs %s' %(data_labels[2], data_labels[0]))
+
+
+
+
+
+model_scikit_overall = LinearRegression().fit(overall_quality_td.reshape(-1,1), sale_price_td)
+
+model_first_floor = LinearRegression().fit(first_floor_square_feet_td.reshape(-1,1), sale_price_td)
+#model_first_floor = reg.predict(first_floor_square_feet_td.reshape(-1,1))
+#print(model_first_floor)
+
+def calculate_prediction(manual_model, scikit_model, x):
+#    pred_manual_model = mx + b
+    pred_manual_model = manual_model[0]*x + manual_model[1]
+    pred_scikit = scikit_model.predict(x.reshape(-1,1))
     
-#model_in_time(train_data_parameter_arr, 1000)
+    return pred_manual_model, pred_scikit, (pred_manual_model + pred_scikit)/2
+
+def add_prediction_graph(x, manual_y, scikit_y, average):
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    plt.plot(x, manual_y, label = 'Manual')
+    plt.plot(x, scikit_y, label = 'Scikit', color=[1, 0, 0])
+    plt.plot(x, average, label = 'Average', color=[1, 0, 1])
     
-    
-    
-    
-    
+    ax.legend() #si no ejecutamos la función "legend" , no se mostraran los labels usados con plot
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    plt.show()    
+
+pred_overall_manual, pred_overall_scikit, pred_overall_mean = calculate_prediction(modelos_overall_quality[499],model_scikit_overall, overall_quality_td)    
+add_prediction_graph(overall_quality_td, pred_overall_manual, pred_overall_scikit, pred_overall_mean)
+
+pred_fsf_manual, pred_fsf_scikit, pred_fsq_mean = calculate_prediction(modelos_first_floor_square[19],model_first_floor, first_floor_square_feet_td)    
+add_prediction_graph(first_floor_square_feet_td, pred_fsf_manual, pred_fsf_scikit, pred_fsq_mean)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
