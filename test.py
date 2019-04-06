@@ -192,19 +192,19 @@ def model_in_time(parameter_arr,x, n, label_title):
 #    ax.set_title('2 curvas en una gráfica')
 
 
-modelos_overall_quality, errores_overall_quality = train_model(overall_quality_td, sale_price_td, 500, 500, 0.0005)
+#modelos_overall_quality, errores_overall_quality = train_model(overall_quality_td, sale_price_td, 500, 500, 0.0005)
 #add_error_gragh(modelos_overall_quality, errores_overall_quality, 'Grafica %s vrs %s' %(data_labels[1], data_labels[0]))
 #model_in_time(modelos_overall_quality, overall_quality_td, 500, '%s vrs %s' %(data_labels[1], data_labels[0]))
 #
-modelos_first_floor_square, errores_first_floor_square = train_model(first_floor_square_feet_td, sale_price_td, 20, 20, 0.0000009)
-#add_error_gragh(modelos_first_floor_square, errores_first_floor_square, 'Grafica %s vrs %s' %(data_labels[2], data_labels[0]))
-#model_in_time(modelos_first_floor_square, first_floor_square_feet_td, 20, '%s vrs %s' %(data_labels[2], data_labels[0]))
+modelos_first_floor_square, errores_first_floor_square = train_model(first_floor_square_feet_td, sale_price_td, 200, 200, 0.0000001)
+add_error_gragh(modelos_first_floor_square, errores_first_floor_square, 'Grafica %s vrs %s' %(data_labels[2], data_labels[0]))
+model_in_time(modelos_first_floor_square, first_floor_square_feet_td, 200, '%s vrs %s' %(data_labels[2], data_labels[0]))
 
 
 
 
 
-model_scikit_overall = LinearRegression().fit(overall_quality_td.reshape(-1,1), sale_price_td)
+#model_scikit_overall = LinearRegression().fit(overall_quality_td.reshape(-1,1), sale_price_td)
 
 model_first_floor = LinearRegression().fit(first_floor_square_feet_td.reshape(-1,1), sale_price_td)
 #model_first_floor = reg.predict(first_floor_square_feet_td.reshape(-1,1))
@@ -232,8 +232,8 @@ def add_prediction_graph(x, manual_y, scikit_y, average):
 #pred_overall_manual, pred_overall_scikit, pred_overall_mean = calculate_prediction(modelos_overall_quality[499],model_scikit_overall, overall_quality_td)    
 #add_prediction_graph(overall_quality_td, pred_overall_manual, pred_overall_scikit, pred_overall_mean)
 #
-#pred_fsf_manual, pred_fsf_scikit, pred_fsq_mean = calculate_prediction(modelos_first_floor_square[19],model_first_floor, first_floor_square_feet_td)    
-#add_prediction_graph(first_floor_square_feet_td, pred_fsf_manual, pred_fsf_scikit, pred_fsq_mean)
+pred_fsf_manual, pred_fsf_scikit, pred_fsq_mean = calculate_prediction(modelos_first_floor_square[199],model_first_floor, first_floor_square_feet_td)    
+add_prediction_graph(first_floor_square_feet_td, pred_fsf_manual, pred_fsf_scikit, pred_fsq_mean)
 
 def calculate_error_against_test_data(predicted_y, test_y):
     return 0.5 * np.mean(np.power(test_y - predicted_y, 2))
@@ -245,7 +245,7 @@ error_overall_manual = calculate_error_against_test_data(pred_overall_manual_tes
 error_overall_scikit = calculate_error_against_test_data(pred_overall_scikit_test_data, sale_price_test_d)
 
 model_scikit_fsf_test_data = LinearRegression().fit(first_floor_square_feet_test_d.reshape(-1,1), sale_price_test_d)
-pred_fsf_manual_test_data, pred_fsf_scikit_test_data, pred_fsf_mean_test_data = calculate_prediction(modelos_first_floor_square[19],model_scikit_fsf_test_data, first_floor_square_feet_test_d)
+pred_fsf_manual_test_data, pred_fsf_scikit_test_data, pred_fsf_mean_test_data = calculate_prediction(modelos_first_floor_square[199],model_scikit_fsf_test_data, first_floor_square_feet_test_d)
 error_fsf_manual = calculate_error_against_test_data(pred_fsf_manual_test_data, sale_price_test_d)
 error_fsf_scikit = calculate_error_against_test_data(pred_fsf_scikit_test_data, sale_price_test_d)
 
